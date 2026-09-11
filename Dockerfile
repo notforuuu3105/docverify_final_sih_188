@@ -27,7 +27,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 WORKDIR /app
 
 # Install lightweight CPU PyTorch first (saves 2.5GB download & prevents OOM)
-RUN pip install --no-cache-dir torch torchvision --index-url https://download.pytorch.org/whl/cpu
+RUN pip install --no-cache-dir torch torchvision --extra-index-url https://download.pytorch.org/whl/cpu
 
 # Install remaining Python dependencies
 COPY requirements.txt ./
