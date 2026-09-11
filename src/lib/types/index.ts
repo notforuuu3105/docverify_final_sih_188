@@ -103,17 +103,56 @@ export type PhotoMatchVerdict =
   | 'Photo match unsuccessful';
 
 export interface BiometricFaceMatchResult {
-  document_photo_url: string;
-  live_booth_photo_url: string;
+  document_photo_url?: string;
+  live_booth_photo_url?: string;
   similarity_score: number; // 0 to 100
-  match_status: 'matched' | 'mismatch' | 'photo_replaced' | 'requires_review' | 'unsuccessful';
+  cosine_metric?: number; // Raw cosine similarity (-1.0 to 1.0)
+  l2_metric?: number; // Euclidean L2 norm distance
+  threshold?: number; // Configured cosine threshold (default 0.363)
+  threshold_percentage?: number; // Calibrated percentage threshold (default 68%)
+  match_status?: 'matched' | 'mismatch' | 'photo_replaced' | 'requires_review' | 'unsuccessful' | 'rejected';
   match_verdict?: PhotoMatchVerdict;
-  liveness_verified: boolean;
-  confidence_level: 'high' | 'medium' | 'low';
-  facial_landmarks_detected: number;
-  tamper_flags: string[];
+  verdict?: 'MATCH' | 'NO_MATCH' | 'REVIEW_REQUIRED' | 'DOCUMENT_FACE_NOT_DETECTED' | 'LIVE_FACE_NOT_DETECTED' | 'MULTIPLE_FACES_DETECTED' | 'QUALITY_CHECK_FAILED' | 'LIVENESS_FAILED' | string;
+  liveness_verified?: boolean;
+  liveness?: {
+    tested: boolean;
+    status: 'PASSED' | 'FAILED' | 'UNVERIFIED' | 'NOT_TESTED';
+    details: string;
+    variance?: number;
+  };
+  confidence_level?: 'high' | 'medium' | 'low';
+  confidence?: 'HIGH' | 'MEDIUM' | 'LOW' | string;
+  facial_landmarks_detected?: number;
+  document_faces_count?: number;
+  live_faces_count?: number;
+  document_face_crop?: string; // base64 data url
+  live_face_crop?: string; // base64 data url
+  quality?: {
+    document_face?: {
+      passed: boolean;
+      blur_score: number;
+      is_blurry: boolean;
+      brightness: number;
+      lighting_status: string;
+      resolution: [number, number];
+      issues: string[];
+    };
+    live_face?: {
+      passed: boolean;
+      blur_score: number;
+      is_blurry: boolean;
+      brightness: number;
+      lighting_status: string;
+      resolution: [number, number];
+      issues: string[];
+    };
+  };
+  tamper_flags?: string[];
+  reasons?: string[];
   manual_review_recommended?: boolean;
   live_photo_timestamp?: string;
+  audit?: Record<string, any>;
+  message?: string;
 }
 
 export interface WatchlistQueryResult {

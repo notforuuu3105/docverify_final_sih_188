@@ -190,7 +190,9 @@ export class ApiService {
     file: File,
     userId: string = 'officer-mha-1',
     categoryHint?: string,
-    onProgress?: (stage: VerificationPipelineStage, label: string, progress: number) => void
+    onProgress?: (stage: VerificationPipelineStage, label: string, progress: number) => void,
+    livePhoto?: File | string,
+    liveFrames?: string[]
   ): Promise<VerificationRecord> {
     const health = await this.checkHealth();
 
@@ -222,6 +224,16 @@ export class ApiService {
     formData.append('user_id', userId);
     if (categoryHint) {
       formData.append('category_hint', categoryHint);
+    }
+    if (livePhoto) {
+      if (typeof livePhoto === 'string') {
+        formData.append('live_photo_b64', livePhoto);
+      } else {
+        formData.append('live_photo', livePhoto, livePhoto.name);
+      }
+    }
+    if (liveFrames && liveFrames.length > 0) {
+      formData.append('live_frames', JSON.stringify(liveFrames));
     }
 
     const timer1 = setTimeout(() => {
@@ -268,25 +280,49 @@ export class ApiService {
       clearTimeout(timer2);
       clearTimeout(timer3);
       clearTimeout(timer4);
-      console.error('Error during backend verification, falling back to local simulation:', err);
-
-      return mockForensicEngine.runForensicVerification(
-        {
-          id: 'doc-' + Date.now().toString(36),
-          user_id: userId,
-          file_name: file.name,
-          file_size: file.size,
-          mime_type: file.type,
-          storage_path: 'temp/' + file.name,
-          sha256_hash: 'sha256-error-fallback',
-          page_count: 1,
-          document_type: (categoryHint as any) || 'identity',
-          uploaded_at: new Date().toISOString(),
-          preview_url: URL.createObjectURL(file),
-        },
-        onProgress || (() => {})
-      );
+      throw err;
     }
+  }
+
+  /**
+   * Dedicated 1:1 Biometric Face Verification (SIH26188):
+   * Compares document portrait against live camera frame.
+   */
+  async verifyFaceBiometrics(params: {
+    documentFile?: File | Blob;
+    documentFaceBase64?: string;
+    liveFile?: File | Blob;
+    liveFaceBase64?: string;
+    liveFrames?: string[];
+  }): Promise<any> {
+    const formData = new FormData();
+    if (params.documentFile) {
+      formData.append('document_file', params.documentFile);
+    }
+    if (params.documentFaceBase64) {
+      formData.append('document_face', params.documentFaceBase64);
+    }
+    if (params.liveFile) {
+      formData.append('live_file', params.liveFile);
+    }
+    if (params.liveFaceBase64) {
+      formData.append('live_face', params.liveFaceBase64);
+    }
+    if (params.liveFrames && params.liveFrames.length > 0) {
+      formData.append('live_frames', JSON.stringify(params.liveFrames));
+    }
+
+    const response = await fetch(API_BASE_URL + '/api/face/verify', {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const errJson = await response.json().catch(() => ({}));
+      throw new Error(errJson.detail || 'Biometric verification failed: ' + response.statusText);
+    }
+
+    return await response.json();
   }
 
   async compareDocuments(

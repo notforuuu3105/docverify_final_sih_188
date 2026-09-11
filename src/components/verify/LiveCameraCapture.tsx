@@ -12,10 +12,11 @@ import {
 import { useLanguage } from '../../context/LanguageContext';
 
 interface LiveCameraCaptureProps {
-  onPhotoConfirmed: (photoDataUrl: string) => void;
+  onPhotoConfirmed: (photoDataUrl: string, burstFrames?: string[]) => void;
   onPhotoReset: () => void;
   confirmedPhoto: string | null;
   isConfirmed: boolean;
+  onSkip?: () => void;
 }
 
 export const LiveCameraCapture: React.FC<LiveCameraCaptureProps> = ({
@@ -23,6 +24,7 @@ export const LiveCameraCapture: React.FC<LiveCameraCaptureProps> = ({
   onPhotoReset,
   confirmedPhoto,
   isConfirmed,
+  onSkip,
 }) => {
   const { language, t } = useLanguage();
   const isHi = language === 'hi';
@@ -33,6 +35,8 @@ export const LiveCameraCapture: React.FC<LiveCameraCaptureProps> = ({
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [captureState, setCaptureState] = useState<'idle' | 'requesting' | 'active' | 'preview'>('idle');
   const [capturedPreview, setCapturedPreview] = useState<string | null>(null);
+  const [capturedBurst, setCapturedBurst] = useState<string[]>([]);
+  const [isCapturingBurst, setIsCapturingBurst] = useState<boolean>(false);
   const [errorType, setErrorType] = useState<'denied' | 'unavailable' | 'other' | null>(null);
   const [errorMsg, setErrorMsg] = useState<string>('');
   const [timestamp, setTimestamp] = useState<string>('');
@@ -112,41 +116,60 @@ export const LiveCameraCapture: React.FC<LiveCameraCaptureProps> = ({
     }
   }, [captureState, stream]);
 
-  // Capture snapshot to canvas
-  const handleTakeSnapshot = () => {
-    if (!videoRef.current || !canvasRef.current) return;
-
+  const grabSingleFrame = (): string | null => {
+    if (!videoRef.current || !canvasRef.current) return null;
     const video = videoRef.current;
     const canvas = canvasRef.current;
     const context = canvas.getContext('2d');
-    if (!context) return;
+    if (!context) return null;
 
-    // Set canvas dimensions matching stream or fallback
     const width = video.videoWidth || 640;
     const height = video.videoHeight || 480;
     canvas.width = width;
     canvas.height = height;
 
-    // Draw frame (mirroring horizontally for natural selfie orientation)
     context.save();
     context.translate(width, 0);
     context.scale(-1, 1);
     context.drawImage(video, 0, 0, width, height);
     context.restore();
 
-    // Export as high quality JPEG data URL
-    const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
-    setCapturedPreview(dataUrl);
-    setTimestamp(new Date().toLocaleTimeString());
+    return canvas.toDataURL('image/jpeg', 0.92);
+  };
 
-    // Stop live camera stream now that snapshot is captured
-    stopStream();
-    setCaptureState('preview');
+  // Capture multi-frame burst (3 frames) for anti-spoofing & liveness verification
+  const handleTakeSnapshot = async () => {
+    if (!videoRef.current || !canvasRef.current) return;
+    setIsCapturingBurst(true);
+
+    const burst: string[] = [];
+    const f1 = grabSingleFrame();
+    if (f1) burst.push(f1);
+
+    await new Promise((r) => setTimeout(r, 150));
+    const f2 = grabSingleFrame();
+    if (f2) burst.push(f2);
+
+    await new Promise((r) => setTimeout(r, 150));
+    const f3 = grabSingleFrame();
+    if (f3) burst.push(f3);
+
+    setIsCapturingBurst(false);
+
+    const mainPhoto = f2 || f1;
+    if (mainPhoto) {
+      setCapturedPreview(mainPhoto);
+      setCapturedBurst(burst);
+      setTimestamp(new Date().toLocaleTimeString());
+      stopStream();
+      setCaptureState('preview');
+    }
   };
 
   // Retake photo: discard preview and restart live camera
   const handleRetake = () => {
     setCapturedPreview(null);
+    setCapturedBurst([]);
     onPhotoReset();
     startCamera();
   };
@@ -160,7 +183,7 @@ export const LiveCameraCapture: React.FC<LiveCameraCaptureProps> = ({
   // Confirm photo: user clicks "Continue"
   const handleContinue = () => {
     if (capturedPreview) {
-      onPhotoConfirmed(capturedPreview);
+      onPhotoConfirmed(capturedPreview, capturedBurst);
       setCaptureState('idle');
     }
   };

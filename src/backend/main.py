@@ -10,7 +10,11 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 if BASE_DIR not in sys.path:
     sys.path.insert(0, BASE_DIR)
 
-from typing import Optional
+import json
+import base64
+import cv2
+import numpy as np
+from typing import Optional, List
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -20,6 +24,7 @@ from pipeline.verification_engine import verification_engine
 from pipeline.comparator import compare_documents
 from pipeline.ocr_engine import run_ocr
 from pipeline.preprocessor import preprocess_document
+from pipeline.face_verifier import face_verifier
 
 app = FastAPI(
     title="DocVerify AI Verification Engine",
@@ -168,15 +173,82 @@ def get_demo_samples():
     return {"samples": samples}
 
 
+def decode_image_bytes(data_bytes: bytes) -> Optional[np.ndarray]:
+    if not data_bytes:
+        return None
+    nparr = np.frombuffer(data_bytes, np.uint8)
+    return cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+
+
+async def decode_image_input(upload_file: Optional[UploadFile], base64_str: Optional[str]) -> Optional[np.ndarray]:
+    if upload_file is not None and upload_file.filename:
+        try:
+            contents = await upload_file.read()
+            if contents:
+                return decode_image_bytes(contents)
+        except Exception:
+            pass
+    if base64_str:
+        try:
+            if "base64," in base64_str:
+                base64_str = base64_str.split("base64,")[1]
+            img_bytes = base64.b64decode(base64_str)
+            return decode_image_bytes(img_bytes)
+        except Exception:
+            pass
+    return None
+
+
+@app.post("/api/face/verify")
+async def verify_faces_endpoint(
+    document_file: Optional[UploadFile] = File(None),
+    document_face: Optional[str] = Form(None),
+    live_file: Optional[UploadFile] = File(None),
+    live_face: Optional[str] = Form(None),
+    live_frames: Optional[str] = Form(None),
+):
+    """
+    Dedicated 1:1 Biometric Face Verification Endpoint (SIH26188):
+    Compares document cardholder portrait against live presented person webcam frame.
+    """
+    try:
+        doc_bgr = await decode_image_input(document_file, document_face)
+        live_bgr = await decode_image_input(live_file, live_face)
+
+        frames_bgr = []
+        if live_frames:
+            try:
+                frame_list = json.loads(live_frames)
+                for f in frame_list:
+                    decoded = await decode_image_input(None, f)
+                    if decoded is not None:
+                        frames_bgr.append(decoded)
+            except Exception:
+                pass
+
+        result = face_verifier.verify(
+            document_bgr=doc_bgr,
+            live_bgr=live_bgr,
+            live_frames=frames_bgr if len(frames_bgr) >= 2 else None,
+        )
+        return JSONResponse(status_code=200, content=result)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Biometric face verification failed: {str(e)}")
+
+
 @app.post("/api/verify")
 async def verify_document_endpoint(
     file: UploadFile = File(...),
     user_id: Optional[str] = Form("officer-mha-1"),
     category_hint: Optional[str] = Form(None),
+    live_photo: Optional[UploadFile] = File(None),
+    live_photo_b64: Optional[str] = Form(None),
+    live_frames: Optional[str] = Form(None),
 ):
     """
     Primary verification endpoint:
-    Processes actual uploaded file bytes through the full 8-stage verification pipeline.
+    Processes actual uploaded file bytes through the full 8-stage verification pipeline
+    and optionally executes 1:1 Biometric Face Verification if a live photo is submitted.
     """
     try:
         file_bytes = await file.read()
@@ -216,6 +288,28 @@ async def verify_document_endpoint(
                 result["document"]["preview_url"] = result.get("detection", {}).get("cropped_document") or f"http://localhost:8000/static/uploads/{safe_filename}"
         else:
             result["document"]["preview_url"] = f"http://localhost:8000/static/uploads/{safe_filename}"
+
+        # If live photo is presented, run 1:1 Two-Source Biometric Verification
+        live_bgr = await decode_image_input(live_photo, live_photo_b64)
+        if live_bgr is not None:
+            doc_bgr = decode_image_bytes(file_bytes)
+            frames_bgr = []
+            if live_frames:
+                try:
+                    frame_list = json.loads(live_frames)
+                    for f in frame_list:
+                        decoded = await decode_image_input(None, f)
+                        if decoded is not None:
+                            frames_bgr.append(decoded)
+                except Exception:
+                    pass
+
+            bio_res = face_verifier.verify(
+                document_bgr=doc_bgr,
+                live_bgr=live_bgr,
+                live_frames=frames_bgr if len(frames_bgr) >= 2 else None,
+            )
+            result["biometric_face_match"] = bio_res
 
         return result
     except Exception as e:

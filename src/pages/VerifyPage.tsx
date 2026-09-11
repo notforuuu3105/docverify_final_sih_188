@@ -38,6 +38,8 @@ import {
   ChevronDown,
   ChevronUp,
   FileText,
+  Camera,
+  X,
 } from 'lucide-react';
 import { supabaseService } from '../lib/services/supabaseService';
 
@@ -53,7 +55,10 @@ export const VerifyPage: React.FC = () => {
   const [subtype, setSubtype] = useState<string>('aadhaar');
   const [uploadFormat, setUploadFormat] = useState<UploadFileFormat | ''>('pdf');
   const [livePhotoData, setLivePhotoData] = useState<string | null>(null);
+  const [liveBurstFrames, setLiveBurstFrames] = useState<string[]>([]);
   const [isLivePhotoConfirmed, setIsLivePhotoConfirmed] = useState<boolean>(false);
+  const [isVerifyingFace, setIsVerifyingFace] = useState<boolean>(false);
+  const [showLiveCameraModal, setShowLiveCameraModal] = useState<boolean>(false);
   const [caseRef] = useState<string>(
     () => 'CASE-GOI-2026-' + Math.random().toString(36).substring(2, 7).toUpperCase()
   );
@@ -85,7 +90,10 @@ export const VerifyPage: React.FC = () => {
     setVerificationResult(null);
     setStage('idle');
     setLivePhotoData(null);
+    setLiveBurstFrames([]);
     setIsLivePhotoConfirmed(false);
+    setIsVerifyingFace(false);
+    setShowLiveCameraModal(false);
   };
 
   const handleClearFile = () => {
@@ -96,7 +104,10 @@ export const VerifyPage: React.FC = () => {
     setStage('idle');
     setActiveRegion(null);
     setLivePhotoData(null);
+    setLiveBurstFrames([]);
     setIsLivePhotoConfirmed(false);
+    setIsVerifyingFace(false);
+    setShowLiveCameraModal(false);
   };
 
   const handleLoadSample = async (sampleId: string) => {
@@ -126,7 +137,10 @@ export const VerifyPage: React.FC = () => {
       setStage('idle');
       setActiveRegion(null);
       setLivePhotoData(null);
+      setLiveBurstFrames([]);
       setIsLivePhotoConfirmed(false);
+      setIsVerifyingFace(false);
+      setShowLiveCameraModal(false);
     } catch (err) {
       console.warn('Could not fetch sample from backend, loading direct preview:', err);
       const fallbackUrl = `/samples/${target.filename}`;
@@ -155,7 +169,9 @@ export const VerifyPage: React.FC = () => {
           setStage(currentStage);
           setStageLabel(label);
           setProgress(prog);
-        }
+        },
+        livePhotoData || undefined,
+        liveBurstFrames.length > 0 ? liveBurstFrames : undefined
       );
 
       // Safe field extractor helper - strictly returns 'Not detected', never dummy demo names
@@ -252,8 +268,8 @@ export const VerifyPage: React.FC = () => {
         };
       }
 
-      // Live biometric face match if officer captured a live photo
-      if (livePhotoData) {
+      // Live biometric face match fallback: only run client fallback if backend did NOT return biometric_face_match
+      if (livePhotoData && !result.biometric_face_match) {
         const docFace = result.face_detection?.cropDataUrl || result.document?.preview_url || previewUrl;
         if (docFace) {
           try {
@@ -290,6 +306,67 @@ export const VerifyPage: React.FC = () => {
       console.error('Verification failed:', err);
       setStage('failed');
       setStageLabel(err.message || 'Verification pipeline encountered an error.');
+    }
+  };
+
+  const handleVerifyLiveFaceOnResults = async (photoUrl: string, burst?: string[]) => {
+    if (!verificationResult) return;
+    setIsVerifyingFace(true);
+    setLivePhotoData(photoUrl);
+    if (burst) setLiveBurstFrames(burst);
+    setIsLivePhotoConfirmed(true);
+
+    try {
+      const docPortrait =
+        verificationResult.face_detection?.cropDataUrl ||
+        verificationResult.detection?.cropped_document ||
+        verificationResult.detection?.original_document ||
+        verificationResult.document?.preview_url ||
+        previewUrl;
+
+      // Call dedicated backend /api/face/verify
+      const faceResult = await apiService.verifyFaceBiometrics({
+        documentFaceBase64: docPortrait,
+        liveFaceBase64: photoUrl,
+        liveFrames: burst && burst.length > 0 ? burst : undefined,
+      });
+
+      if (faceResult && faceResult.biometric_face_match) {
+        const updated: VerificationRecord = {
+          ...verificationResult,
+          biometric_face_match: faceResult.biometric_face_match,
+        };
+        setVerificationResult(updated);
+        try {
+          await supabaseService.saveVerification(updated);
+        } catch {}
+      } else {
+        // Fallback if offline
+        const fallback = await computeFacialComparison(docPortrait, photoUrl);
+        const updated: VerificationRecord = {
+          ...verificationResult,
+          biometric_face_match: fallback,
+        };
+        setVerificationResult(updated);
+      }
+    } catch (err) {
+      console.warn('Live face verification error, falling back to client comparator:', err);
+      try {
+        const docPortrait =
+          verificationResult.face_detection?.cropDataUrl ||
+          verificationResult.detection?.cropped_document ||
+          previewUrl;
+        const fallback = await computeFacialComparison(docPortrait, photoUrl);
+        setVerificationResult({
+          ...verificationResult,
+          biometric_face_match: fallback,
+        });
+      } catch (clientErr) {
+        console.error('All facial comparators failed:', clientErr);
+      }
+    } finally {
+      setIsVerifyingFace(false);
+      setShowLiveCameraModal(false);
     }
   };
 
@@ -540,12 +617,14 @@ export const VerifyPage: React.FC = () => {
           {selectedFile && (
             <div className="space-y-4">
               <LiveCameraCapture
-                onPhotoConfirmed={(photoUrl) => {
+                onPhotoConfirmed={(photoUrl, burst) => {
                   setLivePhotoData(photoUrl);
+                  setLiveBurstFrames(burst || []);
                   setIsLivePhotoConfirmed(true);
                 }}
                 onPhotoReset={() => {
                   setLivePhotoData(null);
+                  setLiveBurstFrames([]);
                   setIsLivePhotoConfirmed(false);
                 }}
                 confirmedPhoto={livePhotoData}
@@ -657,24 +736,28 @@ export const VerifyPage: React.FC = () => {
             }
           />
 
-          {/* YuNet Face Detection Card */}
+          {/* SIH26188: 1:1 Two-Source Biometric Face Verification Pipeline */}
           {verificationResult.verdict !== 'rejected' && (
-            <FaceDetectionCard
-              faceDetection={verificationResult.face_detection}
-              documentUrl={
-                (verificationResult.document?.preview_url && !verificationResult.document.preview_url.toLowerCase().endsWith('.pdf'))
-                  ? verificationResult.document.preview_url
-                  : verificationResult.detection?.original_document || verificationResult.detection?.cropped_document || previewUrl
-              }
-            />
-          )}
-
-          {/* Biometric Facial Comparison Result (if live camera was used) */}
-          {verificationResult.biometric_face_match && (
             <div className="space-y-2">
               <BiometricFaceMatch
                 biometricMatch={verificationResult.biometric_face_match}
                 documentTitle={verificationResult.document?.file_name}
+                documentPortraitUrl={
+                  verificationResult.face_detection?.cropDataUrl ||
+                  (verificationResult.document?.preview_url && !verificationResult.document.preview_url.toLowerCase().endsWith('.pdf')
+                    ? verificationResult.document.preview_url
+                    : verificationResult.detection?.original_document || previewUrl)
+                }
+                documentFullUrl={
+                  (verificationResult.document?.preview_url && !verificationResult.document.preview_url.toLowerCase().endsWith('.pdf'))
+                    ? verificationResult.document.preview_url
+                    : verificationResult.detection?.original_document || verificationResult.detection?.cropped_document || previewUrl
+                }
+                boundingBox={verificationResult.face_detection?.boundingBox}
+                faceDetectionConfidence={verificationResult.face_detection?.confidence}
+                onRetake={() => setShowLiveCameraModal(true)}
+                onStartLiveCapture={() => setShowLiveCameraModal(true)}
+                isVerifying={isVerifyingFace}
               />
             </div>
           )}
@@ -807,6 +890,52 @@ export const VerifyPage: React.FC = () => {
               )}
             </div>
           )}
+        </div>
+      )}
+
+      {/* Live Camera Modal for 1:1 Biometric Verification */}
+      {showLiveCameraModal && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-2xl max-w-xl w-full p-6 space-y-4 border border-gov-line animate-fadeIn">
+            <div className="flex items-center justify-between border-b border-gov-line pb-3">
+              <div className="flex items-center gap-2">
+                <div className="p-1.5 rounded bg-gov-navy-900 text-white">
+                  <Camera className="w-4 h-4 text-gov-saffron" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-gov-navy-950 uppercase tracking-wide">
+                    {isHi ? '1:1 लाइव चेहरा सत्यापन (वेबकैम)' : '1:1 Live Presenter Verification (Webcam)'}
+                  </h3>
+                  <p className="text-[11px] text-gov-inksoft">
+                    {isHi
+                      ? 'कार्डधारक के दस्तावेज़ फोटो के साथ मिलान हेतु लाइव फोटो खींचें'
+                      : 'Capture presenter frame to compare against document credential portrait'}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowLiveCameraModal(false)}
+                className="p-1 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100 cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <LiveCameraCapture
+              onPhotoConfirmed={(photoUrl, burst) => {
+                handleVerifyLiveFaceOnResults(photoUrl, burst);
+              }}
+              onPhotoReset={() => {
+                setLivePhotoData(null);
+                setLiveBurstFrames([]);
+                setIsLivePhotoConfirmed(false);
+              }}
+              confirmedPhoto={livePhotoData}
+              isConfirmed={isLivePhotoConfirmed}
+              onSkip={() => setShowLiveCameraModal(false)}
+            />
+          </div>
         </div>
       )}
     </div>
