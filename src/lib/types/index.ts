@@ -35,7 +35,7 @@ export interface AadhaarOcrData {
   is_masked: boolean;
   full_name: string;
   date_of_birth: string;
-  gender: 'M' | 'F' | 'Other';
+  gender: string;
   address: string;
   qr_code_detected: boolean;
   qr_code_verified: boolean;
@@ -160,7 +160,8 @@ export type VerificationVerdict =
   | 'suspicious' 
   | 'partially_verified' 
   | 'review_required' 
-  | 'invalid';
+  | 'invalid'
+  | 'rejected';
 
 export type FieldVerificationStatus =
   | 'DETECTED'

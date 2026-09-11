@@ -1,4 +1,4 @@
-﻿# ========================================================
+# ========================================================
 # DocVerify AI - Multi-Stage Production Dockerfile
 # Protocol: SIH 2026 PS 188 Full-Stack Platform
 # ========================================================
@@ -7,7 +7,7 @@
 FROM node:20-alpine AS frontend-builder
 WORKDIR /app
 COPY package*.json ./
-RUN npm ci --prefer-offline || npm install
+RUN npm install
 COPY . .
 RUN npm run build
 
@@ -26,7 +26,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /app
 
-# Install Python dependencies
+# Install lightweight CPU PyTorch first (saves 2.5GB download & prevents OOM)
+RUN pip install --no-cache-dir torch torchvision --index-url https://download.pytorch.org/whl/cpu
+
+# Install remaining Python dependencies
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
@@ -41,4 +44,4 @@ COPY --from=frontend-builder /app/dist ./dist
 ENV PORT=8000
 EXPOSE 8000
 
-CMD ["sh", "-c", "python -m uvicorn src.backend.main:app --host 0.0.0.0 --port "]
+CMD ["sh", "-c", "python -m uvicorn src.backend.main:app --host 0.0.0.0 --port ${PORT:-8000}"]

@@ -650,10 +650,10 @@ export const VerifyPage: React.FC = () => {
             originalImageUrl={
               (previewUrl && !previewUrl.toLowerCase().endsWith('.pdf') && !previewUrl.includes('application/pdf'))
                 ? previewUrl
-                : verificationResult.detection?.original_document ||
+                : (verificationResult.detection?.original_document ||
                   (verificationResult.document?.preview_url && !verificationResult.document.preview_url.toLowerCase().endsWith('.pdf')
                     ? verificationResult.document.preview_url
-                    : verificationResult.detection?.cropped_document)
+                    : verificationResult.detection?.cropped_document)) || undefined
             }
           />
 
