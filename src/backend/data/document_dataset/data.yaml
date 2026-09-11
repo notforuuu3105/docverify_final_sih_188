@@ -1,0 +1,5 @@
+path: C:/Users/Hp/AppData/Local/Packages/5319275A.WhatsAppDesktop_cv1g1gvanyjgm/LocalState/sessions/A0E38E967A4D8D84E2B8FC70819332EE55CE39EC/transfers/2026-37/docverify (2)/docverify/src/backend/data/document_dataset
+train: train/images
+val: valid/images
+nc: 6
+names: ['aadhaar', 'pan', 'passport', 'driving_licence', 'voter_id', 'marksheet']

@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { GovTopBar } from '../components/common/GovTopBar';
+import { GovEmblem } from '../components/common/GovEmblem';
 import { ShieldCheck, Lock, Mail, User, ArrowRight, AlertCircle, Building2 } from 'lucide-react';
 
 export const SignUpPage: React.FC = () => {
@@ -19,12 +21,12 @@ export const SignUpPage: React.FC = () => {
     setError(null);
 
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
+      setError('Passphrases do not match');
       return;
     }
 
     if (password.length < 6) {
-      setError('Password must be at least 6 characters');
+      setError('Passphrase must be at least 6 characters in length');
       return;
     }
 
@@ -40,129 +42,156 @@ export const SignUpPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 flex flex-col justify-center items-center p-4 relative overflow-hidden">
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-indigo-600/15 rounded-full blur-3xl pointer-events-none"></div>
+    <div className="min-h-screen bg-gov-paper text-gov-ink flex flex-col selection:bg-gov-navy-800/20 selection:text-gov-navy-900">
+      <GovTopBar showFullHeader={false} />
 
-      <div className="w-full max-w-md relative z-10">
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-tr from-indigo-600 to-purple-600 border border-indigo-400/40 shadow-xl shadow-indigo-600/25 mb-4">
-            <ShieldCheck className="w-9 h-9 text-white" />
+      <div className="flex-1 flex flex-col justify-center items-center p-4 sm:p-6 my-6">
+        <div className="w-full max-w-md space-y-6">
+          <div className="text-center space-y-2">
+            <GovEmblem size="lg" />
+            <div className="pt-2">
+              <span className="text-xs uppercase font-extrabold tracking-wider text-amber-700 font-mono block">
+                TEAM INFERNO
+              </span>
+              <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-gov-navy-950">
+                Analyst Account Registration
+              </h1>
+              <p className="text-xs text-gov-inksoft">
+                Register authorized credentials for document screening & forensics
+              </p>
+            </div>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">Register Auditor Workspace</h1>
-          <p className="text-sm text-slate-400 mt-1">Deploy DocVerify AI detection suite</p>
-        </div>
 
-        <div className="bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-2xl">
-          {error && (
-            <div className="mb-5 p-3 rounded-lg bg-rose-500/10 border border-rose-500/30 flex items-start gap-2.5 text-xs text-rose-300">
-              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-rose-400" />
-              <span>{error}</span>
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-                Full Legal Name
-              </label>
-              <div className="relative">
-                <User className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                <input
-                  type="text"
-                  required
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  placeholder="Dr. Eleanor Ross"
-                  className="w-full bg-slate-950/70 border border-slate-800 rounded-lg pl-10 pr-4 py-2 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
-                />
+          <div className="bg-white border border-gov-line rounded-sm shadow-md overflow-hidden">
+            <div className="bg-gov-navy-900 text-white px-6 py-3.5 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-gov-saffron" />
+                <span className="text-xs font-bold uppercase tracking-wider">
+                  New Officer Registration
+                </span>
               </div>
+              <span className="text-[10px] font-mono text-slate-300">
+                FORM: REG-GOV-01
+              </span>
             </div>
 
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-                Organization / Institution
-              </label>
-              <div className="relative">
-                <Building2 className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                <input
-                  type="text"
-                  value={organization}
-                  onChange={(e) => setOrganization(e.target.value)}
-                  placeholder="Apex Forensic Advisory Inc."
-                  className="w-full bg-slate-950/70 border border-slate-800 rounded-lg pl-10 pr-4 py-2 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
-                />
-              </div>
+            <div className="p-6 space-y-5">
+              {error && (
+                <div className="p-3 rounded bg-rose-50 border border-rose-300 flex items-start gap-2.5 text-xs text-rose-800">
+                  <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-rose-600" />
+                  <span>{error}</span>
+                </div>
+              )}
+
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-bold text-gov-navy-950 uppercase tracking-wide mb-1.5">
+                    Full Legal Name & Designation
+                  </label>
+                  <div className="relative">
+                    <User className="w-4 h-4 text-gov-inksoft absolute left-3.5 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="text"
+                      required
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      placeholder="e.g. Inspector R. Sharma"
+                      className="w-full bg-white border border-gov-line rounded-sm pl-10 pr-4 py-2 text-xs text-gov-ink placeholder-gov-inksoft focus:outline-none focus:border-gov-navy-900 focus:ring-1 focus:ring-gov-navy-900 transition-colors"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-gov-navy-950 uppercase tracking-wide mb-1.5">
+                    Department / Ministry / Agency
+                  </label>
+                  <div className="relative">
+                    <Building2 className="w-4 h-4 text-gov-inksoft absolute left-3.5 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="text"
+                      value={organization}
+                      onChange={(e) => setOrganization(e.target.value)}
+                      placeholder="National Document Verification Authority - Forensics Wing"
+                      className="w-full bg-white border border-gov-line rounded-sm pl-10 pr-4 py-2 text-xs text-gov-ink placeholder-gov-inksoft focus:outline-none focus:border-gov-navy-900 focus:ring-1 focus:ring-gov-navy-900 transition-colors"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-gov-navy-950 uppercase tracking-wide mb-1.5">
+                    Official Government Email
+                  </label>
+                  <div className="relative">
+                    <Mail className="w-4 h-4 text-gov-inksoft absolute left-3.5 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="email"
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="officer@mha.gov.in"
+                      className="w-full bg-white border border-gov-line rounded-sm pl-10 pr-4 py-2 text-xs text-gov-ink placeholder-gov-inksoft focus:outline-none focus:border-gov-navy-900 focus:ring-1 focus:ring-gov-navy-900 transition-colors"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-gov-navy-950 uppercase tracking-wide mb-1.5">
+                    Security Passphrase (min 6 characters)
+                  </label>
+                  <div className="relative">
+                    <Lock className="w-4 h-4 text-gov-inksoft absolute left-3.5 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="password"
+                      required
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="••••••••••••"
+                      className="w-full bg-white border border-gov-line rounded-sm pl-10 pr-4 py-2 text-xs text-gov-ink placeholder-gov-inksoft focus:outline-none focus:border-gov-navy-900 focus:ring-1 focus:ring-gov-navy-900 transition-colors"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-gov-navy-950 uppercase tracking-wide mb-1.5">
+                    Confirm Passphrase
+                  </label>
+                  <div className="relative">
+                    <Lock className="w-4 h-4 text-gov-inksoft absolute left-3.5 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="password"
+                      required
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      placeholder="••••••••••••"
+                      className="w-full bg-white border border-gov-line rounded-sm pl-10 pr-4 py-2 text-xs text-gov-ink placeholder-gov-inksoft focus:outline-none focus:border-gov-navy-900 focus:ring-1 focus:ring-gov-navy-900 transition-colors"
+                    />
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full btn-gov-primary py-2.5 text-xs font-bold flex items-center justify-center gap-2 mt-2"
+                >
+                  <span>{loading ? 'Submitting Registration...' : 'Register Official Credentials'}</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </form>
             </div>
 
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-                Work Email
-              </label>
-              <div className="relative">
-                <Mail className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                <input
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="auditor@organization.com"
-                  className="w-full bg-slate-950/70 border border-slate-800 rounded-lg pl-10 pr-4 py-2 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
-                />
-              </div>
+            <div className="bg-slate-50 border-t border-gov-line px-6 py-3 text-center text-xs text-gov-inksoft">
+              <span>Already registered? </span>
+              <Link to="/login" className="text-gov-navy-900 font-bold hover:underline">
+                Officer Sign In
+              </Link>
             </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-                Password
-              </label>
-              <div className="relative">
-                <Lock className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                <input
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••••••"
-                  className="w-full bg-slate-950/70 border border-slate-800 rounded-lg pl-10 pr-4 py-2 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-                Confirm Password
-              </label>
-              <div className="relative">
-                <Lock className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                <input
-                  type="password"
-                  required
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="••••••••••••"
-                  className="w-full bg-slate-950/70 border border-slate-800 rounded-lg pl-10 pr-4 py-2 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
-                />
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full mt-2 py-2.5 px-4 bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white text-sm font-semibold rounded-lg shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2 transition-all disabled:opacity-50"
-            >
-              {loading ? 'Creating Account...' : 'Complete Registration'}
-              <ArrowRight className="w-4 h-4" />
-            </button>
-          </form>
-
-          <div className="mt-6 text-center text-xs text-slate-400">
-            Already registered?{' '}
-            <Link to="/login" className="text-indigo-400 hover:text-indigo-300 font-semibold">
-              Sign in to workspace
-            </Link>
           </div>
         </div>
       </div>
+
+      <footer className="mt-auto border-t border-gov-line bg-white py-4 px-4 text-center text-xs text-gov-inksoft">
+        <p>© 2026 Government of India • National Document Authenticity Portal</p>
+      </footer>
     </div>
   );
 };

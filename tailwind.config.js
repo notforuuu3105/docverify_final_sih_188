@@ -26,11 +26,33 @@ export default {
           suspicious: '#f59e0b', // yellow / amber
           tampered: '#ef4444', // red / rose
           added: '#3b82f6', // blue
-        }
+        },
+        // Government of India / MHA visual identity
+        gov: {
+          navy: {
+            950: '#0a1f44',
+            900: '#0b2a5c',
+            800: '#123a78',
+            700: '#17469a',
+          },
+          saffron: {
+            DEFAULT: '#ff8f1c',
+            dark: '#d9720c',
+          },
+          green: {
+            DEFAULT: '#0f7a3d',
+            dark: '#0b5c2e',
+          },
+          paper: '#f3f5f8',
+          line: '#d7dde6',
+          ink: '#16233b',
+          inksoft: '#4b586e',
+        },
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
-        mono: ['JetBrains Mono', 'Fira Code', 'Courier New', 'monospace'],
+        sans: ['Noto Sans', 'Inter', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
+        devanagari: ['Noto Sans Devanagari', 'Noto Sans', 'sans-serif'],
+        mono: ['Roboto Mono', 'JetBrains Mono', 'Fira Code', 'Courier New', 'monospace'],
       },
       keyframes: {
         pulseGlow: {

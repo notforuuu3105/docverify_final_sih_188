@@ -10,7 +10,130 @@ export interface UserProfile {
   updated_at: string;
 }
 
-export type DocumentType = 'invoice' | 'identity' | 'contract' | 'certificate' | 'general';
+export type DocumentType = 
+  | 'aadhaar'
+  | 'pan'
+  | 'voter_id'
+  | 'passport' 
+  | 'driving_license'
+  | 'academic'
+  | 'legal'
+  | 'legal_deed'
+  | 'financial'
+  | 'invoice'
+  | 'visa' 
+  | 'national_id' 
+  | 'border_permit' 
+  | 'identity' 
+  | 'contract' 
+  | 'certificate' 
+  | 'land_record' 
+  | 'general';
+
+export interface AadhaarOcrData {
+  aadhaar_number_masked: string;
+  is_masked: boolean;
+  full_name: string;
+  date_of_birth: string;
+  gender: 'M' | 'F' | 'Other';
+  address: string;
+  qr_code_detected: boolean;
+  qr_code_verified: boolean;
+  qr_signature_valid: boolean;
+  photo_tamper_detected: boolean;
+  dob_tamper_detected: boolean;
+  uidai_watermark_present: boolean;
+}
+
+export interface PanOcrData {
+  pan_number: string;
+  pan_format_valid: boolean;
+  full_name: string;
+  father_name: string;
+  date_of_birth: string;
+  photo_verified: boolean;
+  signature_detected: boolean;
+  tamper_flags: string[];
+}
+
+export interface BatchItemResult {
+  id: string;
+  fileName: string;
+  fileSize: string;
+  documentType: DocumentType;
+  verdict: VerificationVerdict;
+  tamperingRiskScore: number;
+  confidenceScore: number;
+  tamperedFields: string[];
+  processedAt: string;
+}
+
+export interface PassportOcrData {
+  document_number: string;
+  document_type_code: string;
+  issuing_country: string;
+  full_name: string;
+  surname: string;
+  given_names: string;
+  nationality: string;
+  date_of_birth: string;
+  gender: 'M' | 'F' | 'X';
+  date_of_expiry: string;
+  place_of_issue?: string;
+  mrz_line1: string;
+  mrz_line2: string;
+  mrz_checksum_valid: boolean;
+  standards_compliance: 'ICAO Doc 9303 Compliant' | 'Non-Compliant Format';
+}
+
+export interface VisaOcrData {
+  visa_number: string;
+  visa_type: string;
+  issuing_post: string;
+  entries_allowed: string;
+  valid_from: string;
+  valid_until: string;
+  stay_duration: string;
+  passport_number_match: boolean;
+}
+
+export type PhotoMatchVerdict = 
+  | 'Photo match successful' 
+  | 'Photo match requires review' 
+  | 'Photo match unsuccessful';
+
+export interface BiometricFaceMatchResult {
+  document_photo_url: string;
+  live_booth_photo_url: string;
+  similarity_score: number; // 0 to 100
+  match_status: 'matched' | 'mismatch' | 'photo_replaced' | 'requires_review' | 'unsuccessful';
+  match_verdict?: PhotoMatchVerdict;
+  liveness_verified: boolean;
+  confidence_level: 'high' | 'medium' | 'low';
+  facial_landmarks_detected: number;
+  tamper_flags: string[];
+  manual_review_recommended?: boolean;
+  live_photo_timestamp?: string;
+}
+
+export interface WatchlistQueryResult {
+  interpol_sltd_status: 'CLEARED' | 'FLAGGED';
+  interpol_sltd_hits: number;
+  national_loc_status?: 'NO_ADVERSE_RECORD' | 'INTERDICTION_REQUIRED';
+  mha_loc_status?: 'NO_ADVERSE_RECORD' | 'INTERDICTION_REQUIRED';
+  expiry_status: 'VALID' | 'EXPIRED' | 'EXPIRING_SOON';
+  days_to_expiry: number;
+}
+
+export interface OfficerEndorsement {
+  officer_id: string;
+  officer_name: string;
+  officer_designation: string;
+  status: 'endorsed' | 'overridden_authentic' | 'referred_physical_lab' | 'cleared_entry' | 'detained_fraud';
+  remarks: string;
+  endorsed_at: string;
+  digital_signature_hash: string;
+}
 
 export interface DocumentRecord {
   id: string;
@@ -22,11 +145,56 @@ export interface DocumentRecord {
   sha256_hash: string;
   page_count: number;
   document_type: DocumentType;
+  subtype?: string;
+  upload_format?: string;
   uploaded_at: string;
   preview_url?: string; // signed URL or local blob URL for preview
+  live_photo_url?: string; // base64 data URI or signed URL of mandatory live selfie
+  ela_image_url?: string; // real computed client-side ELA heatmap image
 }
 
-export type VerificationVerdict = 'authentic' | 'tampered' | 'forged' | 'suspicious';
+export type VerificationVerdict = 
+  | 'authentic' 
+  | 'tampered' 
+  | 'forged' 
+  | 'suspicious' 
+  | 'partially_verified' 
+  | 'review_required' 
+  | 'invalid';
+
+export type FieldVerificationStatus =
+  | 'DETECTED'
+  | 'VALID'
+  | 'MATCHED'
+  | 'MISMATCH'
+  | 'INVALID'
+  | 'NOT_DETECTED'
+  | 'LOW_CONFIDENCE'
+  | 'UNABLE_TO_VERIFY'
+  | 'REVIEW_REQUIRED';
+
+export interface FaceDetectionResult {
+  detected: boolean;
+  count: number;
+  confidence: number;
+  boundingBox: NormalizedCoordinates | null;
+  cropDataUrl?: string;
+  status: 'Face Detected' | 'Face Not Detected';
+  message?: string;
+}
+
+export interface ParsedQrData {
+  detected: boolean;
+  rawPayload?: string;
+  isEncryptedOrUnparseable?: boolean;
+  full_name?: string;
+  date_of_birth?: string;
+  year_of_birth?: string;
+  gender?: string;
+  aadhaar_number_masked?: string;
+  address?: string;
+  statusMessage?: string;
+}
 export type VerificationStatus = 'processing' | 'completed' | 'failed';
 
 export type CheckSeverity = 'low' | 'medium' | 'high' | 'critical';
@@ -60,6 +228,49 @@ export interface VerificationCheck {
   created_at: string;
 }
 
+export interface BoundingBox2D {
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+  width: number;
+  height: number;
+  area?: number;
+  normalized?: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  };
+}
+
+export interface DetectedDocumentItem {
+  type: string;
+  confidence: number;
+  bbox: BoundingBox2D;
+}
+
+export interface PerspectiveCorrectionInfo {
+  applied: boolean;
+  method: string;
+  corners_detected?: boolean;
+  skew_angle?: number;
+}
+
+export interface DocumentDetectionResult {
+  document_detected: boolean;
+  document_type: string;
+  confidence: number;
+  bounding_box?: BoundingBox2D | null;
+  all_detected_documents?: DetectedDocumentItem[];
+  multiple_documents_detected?: boolean;
+  cropped_document?: string | null;
+  original_document?: string | null;
+  quality_score?: number;
+  perspective_correction?: PerspectiveCorrectionInfo;
+  message?: string;
+}
+
 export interface VerificationRecord {
   id: string;
   document_id: string;
@@ -74,6 +285,19 @@ export interface VerificationRecord {
   completed_at?: string;
   document?: DocumentRecord;
   checks?: VerificationCheck[];
+  officer_endorsement?: OfficerEndorsement;
+  ocr_passport_data?: PassportOcrData;
+  ocr_visa_data?: VisaOcrData;
+  aadhaar_data?: AadhaarOcrData;
+  pan_data?: PanOcrData;
+  biometric_face_match?: BiometricFaceMatchResult;
+  face_detection?: FaceDetectionResult;
+  detection?: DocumentDetectionResult;
+  qr_data?: ParsedQrData;
+  watchlist_query?: WatchlistQueryResult;
+  ela_image_url?: string;
+  is_live_ocr?: boolean;
+  live_ocr_raw_text?: string;
 }
 
 export type DifferenceVisualTag = 'red' | 'yellow' | 'green' | 'blue';

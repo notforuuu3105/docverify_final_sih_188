@@ -4,12 +4,12 @@
 
 @layer base {
   :root {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    --background: 210 33% 96%;
+    --foreground: 222 39% 17%;
   }
 
   body {
-    @apply bg-slate-950 text-slate-100 min-h-screen font-sans;
+    @apply bg-gov-paper text-gov-ink min-h-screen font-sans;
   }
 
   #root {
@@ -17,52 +17,97 @@
   }
 }
 
-/* Custom forensic and glassmorphism utilities */
+/* Government of India panel utilities (replaces prior dark glassmorphism) */
 .glass-panel {
-  @apply bg-slate-900/75 backdrop-blur-md border border-slate-800/80 shadow-xl;
+  @apply bg-white border border-gov-line shadow-sm;
 }
 
 .glass-card {
-  @apply bg-slate-900/60 backdrop-blur-sm border border-slate-800/60 rounded-xl;
+  @apply bg-white border border-gov-line rounded-sm;
 }
 
 .glass-card-hover {
-  @apply glass-card hover:border-indigo-500/50 hover:bg-slate-900/80 transition-all duration-200;
+  @apply glass-card hover:border-gov-navy-700/60 hover:shadow-md transition-all duration-200;
 }
 
-/* Forensic scanning animation effect */
-.forensic-scanner-beam {
-  background: linear-gradient(
-    to bottom,
-    transparent 0%,
-    rgba(99, 102, 241, 0.25) 50%,
-    rgba(99, 102, 241, 0.8) 98%,
-    #818cf8 100%
-  );
-  box-shadow: 0 0 15px rgba(99, 102, 241, 0.8);
+/* Tricolor accent strip, used under the top utility bar */
+.tricolor-strip {
+  height: 4px;
+  display: flex;
 }
+.tricolor-strip span { flex: 1; }
+.tricolor-strip span:nth-child(1) { background: #ff9933; }
+.tricolor-strip span:nth-child(2) { background: #ffffff; }
+.tricolor-strip span:nth-child(3) { background: #128807; }
 
-/* Subtle dot-grid background for document forensics viewer */
+/* Subtle grid background retained for forensic viewers, recolored for light theme */
 .bg-forensic-grid {
   background-size: 24px 24px;
-  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.07) 1px, transparent 1px);
+  background-image: radial-gradient(circle, rgba(11, 42, 92, 0.08) 1px, transparent 1px);
 }
 
-/* Custom scrollbars */
+/* Custom scrollbars, recolored for light theme */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(15, 23, 42, 0.6);
+  background: rgba(215, 221, 230, 0.5);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(71, 85, 105, 0.6);
+  background: rgba(11, 42, 92, 0.35);
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(99, 102, 241, 0.7);
+  background: rgba(11, 42, 92, 0.6);
 }
+
+/* Official Government Buttons */
+.btn-gov-primary {
+  @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-sm bg-gov-navy-900 hover:bg-gov-navy-800 text-white text-xs font-semibold tracking-wide shadow-sm border border-gov-navy-950 transition-all active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+.btn-gov-secondary {
+  @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-sm bg-white hover:bg-gov-paper text-gov-navy-950 text-xs font-semibold tracking-wide border border-gov-line shadow-sm transition-all active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+.btn-gov-saffron {
+  @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-sm bg-gov-saffron hover:bg-gov-saffron-dark text-gov-navy-950 text-xs font-bold tracking-wide shadow-sm transition-all active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+/* Official Government Table Styling */
+.gov-table {
+  @apply w-full text-left border-collapse text-xs;
+}
+
+.gov-table thead tr {
+  @apply bg-gov-navy-950 text-white font-bold text-[11px] uppercase tracking-wider;
+}
+
+.gov-table th {
+  @apply py-3 px-4 border-b border-gov-line font-semibold;
+}
+
+.gov-table td {
+  @apply py-3 px-4 border-b border-gov-line text-gov-ink;
+}
+
+.gov-table tbody tr:hover {
+  @apply bg-gov-paper/80 transition-colors;
+}
+
+/* Forensic Scanner Laser Beam */
+.forensic-scanner-beam {
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(15, 122, 61, 0.25) 50%,
+    rgba(255, 143, 28, 0.8) 95%,
+    #ff8f1c 100%
+  );
+  box-shadow: 0 0 15px rgba(255, 143, 28, 0.6);
+}
+

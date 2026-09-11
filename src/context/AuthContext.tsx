@@ -15,10 +15,10 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const DEMO_USER: UserProfile = {
-  id: 'user-demo-1',
-  email: 'analyst@docverify.ai',
-  full_name: 'Dr. Sarah Vance',
-  organization: 'Global Forensic Integrity Labs',
+  id: 'officer-mha-1',
+  email: 'r.sharma@boi.gov.in',
+  full_name: 'Inspector Rajesh Sharma',
+  organization: 'Bureau of Immigration (IGI Airport T3)',
   avatar_url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
   created_at: new Date().toISOString(),
   updated_at: new Date().toISOString(),

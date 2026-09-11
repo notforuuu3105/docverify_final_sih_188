@@ -29,30 +29,30 @@ export function formatPercent(val?: number): string {
 export function getVerdictBadgeClass(verdict?: string): string {
   switch (verdict) {
     case 'authentic':
-      return 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30';
+      return 'bg-emerald-50 text-emerald-800 border-emerald-300 shadow-sm';
     case 'tampered':
-      return 'bg-rose-500/10 text-rose-400 border-rose-500/30';
+      return 'bg-rose-50 text-rose-800 border-rose-300 shadow-sm';
     case 'forged':
-      return 'bg-purple-500/10 text-purple-400 border-purple-500/30';
+      return 'bg-purple-50 text-purple-900 border-purple-300 shadow-sm';
     case 'suspicious':
-      return 'bg-amber-500/10 text-amber-400 border-amber-500/30';
+      return 'bg-amber-50 text-amber-900 border-amber-300 shadow-sm';
     default:
-      return 'bg-slate-500/10 text-slate-400 border-slate-500/30';
+      return 'bg-slate-100 text-slate-800 border-slate-300 shadow-sm';
   }
 }
 
 export function getSeverityBadgeClass(severity?: string): string {
   switch (severity) {
     case 'critical':
-      return 'bg-rose-500/20 text-rose-400 border-rose-500/40';
+      return 'bg-rose-100 text-rose-900 border-rose-300 font-semibold';
     case 'high':
-      return 'bg-orange-500/20 text-orange-400 border-orange-500/40';
+      return 'bg-orange-100 text-orange-900 border-orange-300 font-semibold';
     case 'medium':
-      return 'bg-amber-500/20 text-amber-400 border-amber-500/40';
+      return 'bg-amber-100 text-amber-900 border-amber-300 font-semibold';
     case 'low':
-      return 'bg-blue-500/20 text-blue-400 border-blue-500/40';
+      return 'bg-blue-100 text-blue-900 border-blue-300 font-semibold';
     default:
-      return 'bg-slate-500/20 text-slate-400 border-slate-500/40';
+      return 'bg-slate-100 text-slate-800 border-slate-300 font-semibold';
   }
 }
 
@@ -65,31 +65,31 @@ export function getTagColorClass(tag: 'red' | 'yellow' | 'green' | 'blue'): {
   switch (tag) {
     case 'red':
       return {
-        border: 'border-rose-500',
-        bg: 'bg-rose-500/20',
-        badge: 'bg-rose-500/15 text-rose-400 border-rose-500/30',
-        indicator: 'bg-rose-500',
+        border: 'border-rose-600',
+        bg: 'bg-rose-50',
+        badge: 'bg-rose-50 text-rose-800 border-rose-300',
+        indicator: 'bg-rose-600',
       };
     case 'yellow':
       return {
-        border: 'border-amber-500',
-        bg: 'bg-amber-500/20',
-        badge: 'bg-amber-500/15 text-amber-400 border-amber-500/30',
-        indicator: 'bg-amber-500',
+        border: 'border-amber-600',
+        bg: 'bg-amber-50',
+        badge: 'bg-amber-50 text-amber-800 border-amber-300',
+        indicator: 'bg-amber-600',
       };
     case 'green':
       return {
-        border: 'border-emerald-500',
-        bg: 'bg-emerald-500/20',
-        badge: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
-        indicator: 'bg-emerald-500',
+        border: 'border-emerald-600',
+        bg: 'bg-emerald-50',
+        badge: 'bg-emerald-50 text-emerald-800 border-emerald-300',
+        indicator: 'bg-emerald-600',
       };
     case 'blue':
       return {
-        border: 'border-sky-500',
-        bg: 'bg-sky-500/20',
-        badge: 'bg-sky-500/15 text-sky-400 border-sky-500/30',
-        indicator: 'bg-sky-500',
+        border: 'border-sky-600',
+        bg: 'bg-sky-50',
+        badge: 'bg-sky-50 text-sky-800 border-sky-300',
+        indicator: 'bg-sky-600',
       };
   }
 }

@@ -3,8 +3,6 @@ import {
   DocumentRecord,
   VerificationRecord,
   ComparisonRecord,
-  ComparisonDifference,
-  ReportRecord,
 } from '../types';
 import { mockStore } from '../mockAI/mockEngine';
 

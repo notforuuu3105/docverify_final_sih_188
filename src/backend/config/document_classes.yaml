@@ -1,0 +1,23 @@
+names:
+  0: aadhaar
+  1: pan
+  2: passport
+  3: driving_licence
+  4: voter_id
+  5: marksheet
+
+nc: 6
+
+display_names:
+  aadhaar: "Aadhaar Card"
+  pan: "PAN Card"
+  passport: "Indian Passport"
+  driving_licence: "Driving Licence"
+  voter_id: "Voter ID Card (EPIC)"
+  marksheet: "Marksheet / Degree Certificate"
+
+confidence_threshold: 0.20
+padding_ratio: 0.02
+perspective_correction_enabled: true
+min_area_ratio: 0.05
+max_area_ratio: 0.98

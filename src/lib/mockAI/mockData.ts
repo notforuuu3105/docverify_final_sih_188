@@ -1,10 +1,171 @@
 import { VerificationRecord, ComparisonRecord, DocumentRecord } from '../types';
 
-// Helper to generate SVG document previews as Data URLs for immediate visual testing
-export function generateMockDocumentSvg(type: 'invoice_orig' | 'invoice_tampered' | 'id_authentic' | 'cert_forged'): string {
+export function generateMockDocumentSvg(
+  type:
+    | 'aadhaar_authentic'
+    | 'aadhaar_tampered'
+    | 'pan_authentic'
+    | 'pan_tampered'
+    | 'passport_authentic'
+    | 'passport_tampered'
+    | 'visa_authentic'
+    | 'invoice_orig'
+    | 'invoice_tampered'
+    | 'id_authentic'
+    | 'cert_forged'
+): string {
   let content = '';
 
-  if (type === 'invoice_orig') {
+  if (type === 'aadhaar_authentic') {
+    content = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="600" height="380" viewBox="0 0 600 380" style="background:#ffffff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+        <rect x="10" y="10" width="580" height="360" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+        <rect x="10" y="10" width="580" height="42" rx="8" fill="#f8fafc"/>
+        <rect x="10" y="48" width="580" height="4" fill="#f59e0b"/>
+        <text x="300" y="32" font-size="13" font-weight="bold" fill="#0f172a" text-anchor="middle">भारत सरकार | GOVERNMENT OF INDIA</text>
+        <text x="30" y="32" font-size="11" font-weight="bold" fill="#1e3a8a">UIDAI</text>
+        <rect x="35" y="70" width="120" height="150" rx="4" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5"/>
+        <circle cx="95" cy="125" r="32" fill="#cbd5e1"/>
+        <path d="M55,195 C55,155 135,155 135,195 Z" fill="#94a3b8"/>
+        <text x="95" y="212" font-size="8" font-weight="bold" fill="#475569" text-anchor="middle">CITIZEN PHOTO</text>
+        <text x="175" y="85" font-size="10" font-weight="bold" fill="#64748b">नाम / Name</text>
+        <text x="175" y="105" font-size="15" font-weight="bold" fill="#0f172a">आरव वर्मा / Aarav Verma</text>
+        <text x="175" y="130" font-size="10" font-weight="bold" fill="#64748b">जन्म तिथि / DOB</text>
+        <text x="175" y="148" font-size="13" font-weight="bold" fill="#0f172a">14/08/1992</text>
+        <text x="175" y="173" font-size="10" font-weight="bold" fill="#64748b">लिंग / Gender</text>
+        <text x="175" y="191" font-size="13" font-weight="bold" fill="#0f172a">पुरुष / MALE</text>
+        <rect x="430" y="70" width="135" height="135" rx="4" fill="#f8fafc" stroke="#334155" stroke-width="2"/>
+        <rect x="440" y="80" width="30" height="30" fill="#0f172a"/>
+        <rect x="445" y="85" width="20" height="20" fill="#ffffff"/>
+        <rect x="450" y="90" width="10" height="10" fill="#0f172a"/>
+        <rect x="525" y="80" width="30" height="30" fill="#0f172a"/>
+        <rect x="530" y="85" width="20" height="20" fill="#ffffff"/>
+        <rect x="535" y="90" width="10" height="10" fill="#0f172a"/>
+        <rect x="440" y="165" width="30" height="30" fill="#0f172a"/>
+        <rect x="445" y="170" width="20" height="20" fill="#ffffff"/>
+        <rect x="450" y="175" width="10" height="10" fill="#0f172a"/>
+        <text x="497" y="222" font-size="8" font-weight="bold" fill="#16a34a" text-anchor="middle">✓ SECURE UIDAI QR</text>
+        <rect x="35" y="245" width="530" height="55" rx="4" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"/>
+        <text x="300" y="280" font-family="'Courier New', monospace" font-size="24" font-weight="bold" fill="#0f172a" text-anchor="middle" letter-spacing="4">XXXX XXXX 8841</text>
+        <text x="300" y="295" font-size="8" fill="#64748b" text-anchor="middle">VID: 9182 0482 1984 2104</text>
+        <rect x="10" y="325" width="580" height="45" rx="8" fill="#e11d48"/>
+        <text x="300" y="352" font-size="13" font-weight="bold" fill="#ffffff" text-anchor="middle">मेरा आधार, मेरी पहचान (आधार - आम आदमी का अधिकार)</text>
+      </svg>
+    `;
+  } else if (type === 'aadhaar_tampered') {
+    content = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="600" height="380" viewBox="0 0 600 380" style="background:#ffffff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+        <rect x="10" y="10" width="580" height="360" rx="10" fill="#ffffff" stroke="#e11d48" stroke-width="2"/>
+        <rect x="10" y="10" width="580" height="42" rx="8" fill="#f8fafc"/>
+        <rect x="10" y="48" width="580" height="4" fill="#e11d48"/>
+        <text x="300" y="32" font-size="13" font-weight="bold" fill="#0f172a" text-anchor="middle">भारत सरकार | GOVERNMENT OF INDIA</text>
+        <text x="30" y="32" font-size="11" font-weight="bold" fill="#1e3a8a">UIDAI</text>
+        <rect x="30" y="65" width="130" height="160" rx="4" fill="none" stroke="#e11d48" stroke-dasharray="4,3" stroke-width="2"/>
+        <rect x="35" y="70" width="120" height="150" rx="4" fill="#fee2e2" stroke="#e11d48" stroke-width="1.5"/>
+        <circle cx="95" cy="125" r="32" fill="#f43f5e"/>
+        <path d="M55,195 C55,155 135,155 135,195 Z" fill="#be123c"/>
+        <rect x="35" y="195" width="120" height="25" fill="#e11d48"/>
+        <text x="95" y="211" font-size="8" font-weight="bold" fill="#ffffff" text-anchor="middle">⚠️ PHOTO SPLICED</text>
+        <text x="175" y="85" font-size="10" font-weight="bold" fill="#64748b">नाम / Name</text>
+        <text x="175" y="105" font-size="15" font-weight="bold" fill="#0f172a">रोहन शर्मा / Rohan Sharma</text>
+        <text x="175" y="130" font-size="10" font-weight="bold" fill="#64748b">जन्म तिथि / DOB</text>
+        <rect x="170" y="135" width="110" height="25" fill="#fee2e2" stroke="#e11d48" stroke-width="1.5" rx="3"/>
+        <text x="175" y="152" font-size="13" font-weight="bold" fill="#be123c">05/11/2002 ⚠️</text>
+        <text x="175" y="180" font-size="10" font-weight="bold" fill="#64748b">लिंग / Gender</text>
+        <text x="175" y="198" font-size="13" font-weight="bold" fill="#0f172a">पुरुष / MALE</text>
+        <rect x="430" y="70" width="135" height="135" rx="4" fill="#fff1f2" stroke="#e11d48" stroke-width="2"/>
+        <rect x="440" y="80" width="30" height="30" fill="#9f1239"/>
+        <rect x="525" y="80" width="30" height="30" fill="#9f1239"/>
+        <rect x="440" y="165" width="30" height="30" fill="#9f1239"/>
+        <text x="497" y="222" font-size="8" font-weight="bold" fill="#e11d48" text-anchor="middle">⚠️ QR CHECKSUM FAIL</text>
+        <rect x="35" y="245" width="530" height="55" rx="4" fill="#fff1f2" stroke="#e11d48" stroke-width="1.5"/>
+        <text x="300" y="280" font-family="'Courier New', monospace" font-size="22" font-weight="bold" fill="#be123c" text-anchor="middle" letter-spacing="3">8912 3456 8841 (UNMASKED)</text>
+        <text x="300" y="295" font-size="8" font-weight="bold" fill="#e11d48" text-anchor="middle">⚠️ VIOLATION: FULL AADHAAR UNMASKED</text>
+        <rect x="10" y="325" width="580" height="45" rx="8" fill="#e11d48"/>
+        <text x="300" y="352" font-size="13" font-weight="bold" fill="#ffffff" text-anchor="middle">मेरा आधार, मेरी पहचान (आधार - आम आदमी का अधिकार)</text>
+      </svg>
+    `;
+  } else if (type === 'passport_authentic') {
+    content = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="600" height="850" viewBox="0 0 600 850" style="background:#f8fafc; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+        <rect x="15" y="15" width="570" height="820" rx="8" fill="#fcfcf9" stroke="#334155" stroke-width="2"/>
+        <rect x="25" y="25" width="550" height="800" rx="6" fill="#fbfbfa" stroke="#e2e8f0" stroke-width="1"/>
+        <rect x="25" y="25" width="550" height="95" fill="#0f172a" rx="4"/>
+        <text x="300" y="55" font-size="11" font-weight="bold" fill="#f59e0b" text-anchor="middle" letter-spacing="2">REPUBLIC OF INDIA / भारत गणराज्य</text>
+        <text x="300" y="80" font-size="19" font-weight="bold" fill="#ffffff" text-anchor="middle" letter-spacing="3">PASSPORT / पासपोर्ट</text>
+        <text x="300" y="102" font-size="10" fill="#94a3b8" text-anchor="middle">TYPE/प्रकार: P • COUNTRY CODE/कोड: IND • PASSPORT NO: A9842104</text>
+        <rect x="45" y="140" width="160" height="200" rx="4" fill="#e2e8f0" stroke="#0f172a" stroke-width="1.5"/>
+        <circle cx="125" cy="210" r="42" fill="#94a3b8"/>
+        <path d="M75,310 C75,260 175,260 175,310 Z" fill="#64748b"/>
+        <text x="125" y="330" font-size="9" font-weight="bold" fill="#0f172a" text-anchor="middle">OFFICIAL BIOMETRIC PHOTO</text>
+        <text x="230" y="155" font-size="9" font-weight="bold" fill="#64748b">SURNAME / उपनाम</text>
+        <text x="230" y="175" font-size="14" font-weight="bold" fill="#0f172a">VERMA</text>
+        <text x="230" y="200" font-size="9" font-weight="bold" fill="#64748b">GIVEN NAME(S) / दिया गया नाम</text>
+        <text x="230" y="220" font-size="14" font-weight="bold" fill="#0f172a">PRIYA SUNIL</text>
+        <text x="230" y="245" font-size="9" font-weight="bold" fill="#64748b">NATIONALITY / राष्ट्रीयता</text>
+        <text x="230" y="265" font-size="12" font-weight="bold" fill="#0f172a">INDIAN</text>
+        <text x="380" y="245" font-size="9" font-weight="bold" fill="#64748b">SEX / लिंग</text>
+        <text x="380" y="265" font-size="12" font-weight="bold" fill="#0f172a">F</text>
+        <text x="230" y="290" font-size="9" font-weight="bold" fill="#64748b">DATE OF BIRTH / जन्म तिथि</text>
+        <text x="230" y="310" font-size="12" font-weight="bold" fill="#0f172a">22/09/1992</text>
+        <text x="380" y="290" font-size="9" font-weight="bold" fill="#64748b">PLACE OF BIRTH / जन्म स्थान</text>
+        <text x="380" y="310" font-size="12" font-weight="bold" fill="#0f172a">MUMBAI, MAHARASHTRA</text>
+        <text x="45" y="375" font-size="9" font-weight="bold" fill="#64748b">DATE OF ISSUE / जारी करने की तिथि</text>
+        <text x="45" y="395" font-size="12" font-weight="bold" fill="#0f172a">22/09/2022</text>
+        <text x="230" y="375" font-size="9" font-weight="bold" fill="#64748b">DATE OF EXPIRY / समाप्ति की तिथि</text>
+        <text x="230" y="395" font-size="12" font-weight="bold" fill="#0f172a">21/09/2032</text>
+        <text x="380" y="375" font-size="9" font-weight="bold" fill="#64748b">PLACE OF ISSUE / जारी करने का स्थान</text>
+        <text x="380" y="395" font-size="12" font-weight="bold" fill="#0f172a">RPO MUMBAI</text>
+        <rect x="35" y="680" width="530" height="110" fill="#f1f5f9" stroke="#cbd5e1" rx="4"/>
+        <text x="50" y="705" font-size="9" font-weight="bold" fill="#475569">ICAO DOC 9303 MACHINE READABLE ZONE (MRZ):</text>
+        <text x="50" y="738" font-family="'Courier New', monospace" font-size="14" font-weight="bold" fill="#0f172a" letter-spacing="3.5">P&lt;INDVERMA&lt;&lt;PRIYA&lt;SUNIL&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</text>
+        <text x="50" y="768" font-family="'Courier New', monospace" font-size="14" font-weight="bold" fill="#0f172a" letter-spacing="3.5">A9842104&lt;8IND9209224F3209218&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;04</text>
+      </svg>
+    `;
+  } else if (type === 'passport_tampered') {
+    content = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="600" height="850" viewBox="0 0 600 850" style="background:#f8fafc; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+        <rect x="15" y="15" width="570" height="820" rx="8" fill="#fcfcf9" stroke="#334155" stroke-width="2"/>
+        <rect x="25" y="25" width="550" height="800" rx="6" fill="#fbfbfa" stroke="#e2e8f0" stroke-width="1"/>
+        <rect x="25" y="25" width="550" height="95" fill="#0f172a" rx="4"/>
+        <text x="300" y="55" font-size="11" font-weight="bold" fill="#f59e0b" text-anchor="middle" letter-spacing="2">REPUBLIC OF INDIA / भारत गणराज्य</text>
+        <text x="300" y="80" font-size="19" font-weight="bold" fill="#ffffff" text-anchor="middle" letter-spacing="3">PASSPORT / पासपोर्ट</text>
+        <text x="300" y="102" font-size="10" fill="#94a3b8" text-anchor="middle">TYPE/प्रकार: P • COUNTRY CODE/कोड: IND • PASSPORT NO: Z5891402</text>
+        <rect x="40" y="135" width="170" height="210" rx="4" fill="none" stroke="#e11d48" stroke-dasharray="4,3" stroke-width="2"/>
+        <rect x="45" y="140" width="160" height="200" rx="4" fill="#fee2e2" stroke="#e11d48" stroke-width="1.5"/>
+        <circle cx="125" cy="210" r="42" fill="#f43f5e"/>
+        <path d="M75,310 C75,260 175,260 175,310 Z" fill="#be123c"/>
+        <rect x="45" y="315" width="160" height="25" fill="#e11d48"/>
+        <text x="125" y="331" font-size="9" font-weight="bold" fill="#ffffff" text-anchor="middle">⚠️ PHOTO SPLICED</text>
+        <text x="230" y="155" font-size="9" font-weight="bold" fill="#64748b">SURNAME / उपनाम</text>
+        <text x="230" y="175" font-size="14" font-weight="bold" fill="#0f172a">SHARMA</text>
+        <text x="230" y="200" font-size="9" font-weight="bold" fill="#64748b">GIVEN NAME(S) / दिया गया नाम</text>
+        <text x="230" y="220" font-size="14" font-weight="bold" fill="#0f172a">RAJESH KUMAR</text>
+        <text x="230" y="245" font-size="9" font-weight="bold" fill="#64748b">NATIONALITY / राष्ट्रीयता</text>
+        <text x="230" y="265" font-size="12" font-weight="bold" fill="#0f172a">INDIAN</text>
+        <text x="380" y="245" font-size="9" font-weight="bold" fill="#64748b">SEX / लिंग</text>
+        <text x="380" y="265" font-size="12" font-weight="bold" fill="#0f172a">M</text>
+        <text x="230" y="290" font-size="9" font-weight="bold" fill="#64748b">DATE OF BIRTH / जन्म तिथि</text>
+        <rect x="226" y="294" width="115" height="22" fill="#fff1f2" stroke="#e11d48" stroke-dasharray="2,2"/>
+        <text x="230" y="310" font-family="'Courier New', monospace" font-size="13" font-weight="bold" fill="#e11d48">14/05/1996</text>
+        <text x="380" y="290" font-size="9" font-weight="bold" fill="#64748b">PLACE OF BIRTH / जन्म स्थान</text>
+        <text x="380" y="310" font-size="12" font-weight="bold" fill="#0f172a">NEW DELHI</text>
+        <text x="45" y="375" font-size="9" font-weight="bold" fill="#64748b">DATE OF ISSUE / जारी करने की तिथि</text>
+        <text x="45" y="395" font-size="12" font-weight="bold" fill="#0f172a">12/03/2021</text>
+        <text x="230" y="375" font-size="9" font-weight="bold" fill="#64748b">DATE OF EXPIRY / समाप्ति की तिथि</text>
+        <rect x="226" y="379" width="115" height="22" fill="#fff1f2" stroke="#e11d48" stroke-dasharray="2,2"/>
+        <text x="230" y="395" font-family="'Courier New', monospace" font-size="13" font-weight="bold" fill="#e11d48">11/03/2036</text>
+        <text x="380" y="375" font-size="9" font-weight="bold" fill="#64748b">PLACE OF ISSUE / जारी करने का स्थान</text>
+        <text x="380" y="395" font-size="12" font-weight="bold" fill="#0f172a">RPO DELHI</text>
+        <rect x="45" y="440" width="510" height="40" fill="#fee2e2" stroke="#e11d48" stroke-width="1.5" rx="4"/>
+        <text x="300" y="465" font-size="11" font-weight="bold" fill="#be123c" text-anchor="middle">🚨 NATIONAL WATCHLIST HIT: LOOKOUT CIRCULAR (LOC) ACTIVE</text>
+        <rect x="35" y="680" width="530" height="110" fill="#fff1f2" stroke="#e11d48" stroke-width="1.5" rx="4"/>
+        <text x="50" y="705" font-size="9" font-weight="bold" fill="#be123c">⚠️ MRZ CHECKSUM COMPUTATION FAILURE (LINE 2):</text>
+        <text x="50" y="738" font-family="'Courier New', monospace" font-size="14" font-weight="bold" fill="#0f172a" letter-spacing="3.5">P&lt;INDSHARMA&lt;&lt;RAJESH&lt;KUMAR&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</text>
+        <text x="50" y="768" font-family="'Courier New', monospace" font-size="14" font-weight="bold" fill="#e11d48" letter-spacing="3.5">Z5891402&lt;4IND9605148M3603115&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;06</text>
+      </svg>
+    `;
+  } else if (type === 'invoice_orig') {
     content = `
       <svg xmlns="http://www.w3.org/2000/svg" width="600" height="850" viewBox="0 0 600 850" style="background:#ffffff; font-family: sans-serif;">
         <!-- Header -->
@@ -154,52 +315,225 @@ export function generateMockDocumentSvg(type: 'invoice_orig' | 'invoice_tampered
   return 'data:image/svg+xml;utf8,' + encodeURIComponent(content.trim());
 }
 
-// Initial mock database store for seamless offline/sandbox development
+// Initial mock database store for citizen identity and document verification
 export const INITIAL_MOCK_DOCUMENTS: DocumentRecord[] = [
   {
-    id: 'doc-orig-101',
-    user_id: 'user-demo-1',
-    file_name: 'Acme_Supply_Invoice_2026_Orig.pdf',
-    file_size: 482910,
+    id: 'doc-aadhaar-auth-01',
+    user_id: 'officer-goi-1',
+    file_name: 'Aadhaar_Card_Arun_Verma_Authentic.pdf',
+    file_size: 345600,
     mime_type: 'application/pdf',
-    storage_path: 'user-demo-1/doc-orig-101/Acme_Supply_Invoice_2026_Orig.pdf',
-    sha256_hash: 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
+    storage_path: 'officer-goi-1/doc-aadhaar-auth-01/Aadhaar_Card_Arun_Verma_Authentic.pdf',
+    sha256_hash: '8f12b28c34f1e091567d4982a176e5c82098b163d04071fa6e921d78294a0999',
     page_count: 1,
-    document_type: 'invoice',
-    uploaded_at: new Date(Date.now() - 3600 * 1000 * 4).toISOString(),
-    preview_url: generateMockDocumentSvg('invoice_orig'),
+    document_type: 'aadhaar',
+    subtype: 'aadhaar',
+    upload_format: 'pdf',
+    uploaded_at: new Date(Date.now() - 3600 * 1000 * 5).toISOString(),
+    preview_url: generateMockDocumentSvg('aadhaar_authentic'),
   },
   {
-    id: 'doc-tamp-202',
-    user_id: 'user-demo-1',
-    file_name: 'Acme_Supply_Invoice_2026_Altered.pdf',
-    file_size: 491204,
+    id: 'doc-aadhaar-tamp-02',
+    user_id: 'officer-goi-1',
+    file_name: 'Aadhaar_Card_Rohan_Sharma_Tampered.pdf',
+    file_size: 362100,
     mime_type: 'application/pdf',
-    storage_path: 'user-demo-1/doc-tamp-202/Acme_Supply_Invoice_2026_Altered.pdf',
-    sha256_hash: '8f434346648f6b96df89dda901c5176b10a6d83961dd3c1ac88b59b2dc327aa4',
+    storage_path: 'officer-goi-1/doc-aadhaar-tamp-02/Aadhaar_Card_Rohan_Sharma_Tampered.pdf',
+    sha256_hash: '5d318e9a2b704cb5038b3459c34b1a457492c10b7b39d1b090a2938e55e04444',
     page_count: 1,
-    document_type: 'invoice',
+    document_type: 'aadhaar',
+    subtype: 'aadhaar',
+    upload_format: 'scanner_flatbed',
+    uploaded_at: new Date(Date.now() - 3600 * 1000 * 3).toISOString(),
+    preview_url: generateMockDocumentSvg('aadhaar_tampered'),
+  },
+  {
+    id: 'doc-pass-auth-01',
+    user_id: 'officer-goi-1',
+    file_name: 'Indian_Passport_A9842104_Authentic.pdf',
+    file_size: 512400,
+    mime_type: 'application/pdf',
+    storage_path: 'officer-goi-1/doc-pass-auth-01/Indian_Passport_A9842104_Authentic.pdf',
+    sha256_hash: '9a71b28c34f1e091567d4982a176e5c82098b163d04071fa6e921d78294a0812',
+    page_count: 1,
+    document_type: 'passport',
+    subtype: 'passport_regular',
+    upload_format: 'pdf',
+    uploaded_at: new Date(Date.now() - 3600 * 1000 * 4).toISOString(),
+    preview_url: generateMockDocumentSvg('passport_authentic'),
+  },
+  {
+    id: 'doc-pass-tamp-02',
+    user_id: 'officer-goi-1',
+    file_name: 'Indian_Passport_Z5891402_Tampered.pdf',
+    file_size: 524180,
+    mime_type: 'application/pdf',
+    storage_path: 'officer-goi-1/doc-pass-tamp-02/Indian_Passport_Z5891402_Tampered.pdf',
+    sha256_hash: '3f518e9a2b704cb5038b3459c34b1a457492c10b7b39d1b090a2938e55e09f58',
+    page_count: 1,
+    document_type: 'passport',
+    subtype: 'passport_regular',
+    upload_format: 'scanner_flatbed',
     uploaded_at: new Date(Date.now() - 3600 * 1000 * 2).toISOString(),
-    preview_url: generateMockDocumentSvg('invoice_tampered'),
+    preview_url: generateMockDocumentSvg('passport_tampered'),
   },
 ];
 
 export const INITIAL_MOCK_VERIFICATIONS: VerificationRecord[] = [
   {
-    id: 'verif-tamp-1',
-    document_id: 'doc-tamp-202',
-    user_id: 'user-demo-1',
+    id: 'verif-aadhaar-tamp-1',
+    document_id: 'doc-aadhaar-tamp-02',
+    user_id: 'officer-goi-1',
     status: 'completed',
     verdict: 'tampered',
-    confidence_score: 96.2,
-    tampering_risk_score: 91.4,
-    summary: 'High probability of digital tampering detected. Anomaly analysis reveals spliced font baseline on payable amount and anomalous JPEG quantization around the recipient banking details.',
+    confidence_score: 98.2,
+    tampering_risk_score: 94.0,
+    summary: 'Aadhaar Tampering Detected: Photo splicing boundary detected on citizen photograph, date of birth typography shifted, and UIDAI QR code digital signature mismatch.',
+    metadata_analysis: {
+      pdf_version: '1.6',
+      producer: 'Canva / Digital Image Editor',
+      tamper_detected: true,
+      exif_anomalies: 2,
+      stream_hashes_match: false,
+    },
+    aadhaar_data: {
+      aadhaar_number_masked: '8912 3456 8841 (UNMASKED)',
+      is_masked: false,
+      full_name: 'Rohan Sharma',
+      date_of_birth: '05/11/2002',
+      gender: 'M',
+      address: 'Plot 12, Gali No 4, Anand Vihar, East Delhi, Delhi - 110092',
+      qr_code_detected: true,
+      qr_code_verified: false,
+      qr_signature_valid: false,
+      photo_tamper_detected: true,
+      dob_tamper_detected: true,
+      uidai_watermark_present: true,
+    },
+    created_at: new Date(Date.now() - 3600 * 1000 * 3).toISOString(),
+    completed_at: new Date(Date.now() - 3600 * 1000 * 3 + 4000).toISOString(),
+    checks: [
+      {
+        id: 'chk-aadh-1',
+        verification_id: 'verif-aadhaar-tamp-1',
+        check_type: 'digital_tampering',
+        title: 'Photo Splicing Boundary Detected',
+        description: 'Pixel gradient analysis reveals photo replacement overlay with unnatural bounding seam.',
+        status: 'failed',
+        score: 18,
+        findings: {
+          edge_contrast_variance: 4.8,
+          compression_ratio_shift: 3.2,
+          splicing_detected: true,
+        },
+        suspicious_regions: [
+          {
+            id: 'reg-aadh-photo',
+            page: 1,
+            coordinates: { x: 0.05, y: 0.17, width: 0.22, height: 0.42 },
+            severity: 'critical',
+            label: 'Photo Replacement Seam',
+            description: 'Manipulated citizen photograph inserted over original background.',
+          },
+        ],
+        created_at: new Date().toISOString(),
+      },
+      {
+        id: 'chk-aadh-2',
+        verification_id: 'verif-aadhaar-tamp-1',
+        check_type: 'font_consistency',
+        title: 'DOB Font Kerning Mismatch',
+        description: 'The date of birth "05/11/2002" does not match standard UIDAI typography font metrics.',
+        status: 'failed',
+        score: 24,
+        findings: {
+          font_family_detected: 'Arial Bold',
+          expected_font: 'Noto Sans Devanagari / Arial Regular',
+          baseline_shift_pt: 3.1,
+        },
+        suspicious_regions: [
+          {
+            id: 'reg-aadh-dob',
+            page: 1,
+            coordinates: { x: 0.28, y: 0.35, width: 0.20, height: 0.08 },
+            severity: 'high',
+            label: 'Altered Date of Birth',
+            description: 'Year of birth modified from 1992 to 2002 using digital text box insertion.',
+          },
+        ],
+        created_at: new Date().toISOString(),
+      },
+      {
+        id: 'chk-aadh-3',
+        verification_id: 'verif-aadhaar-tamp-1',
+        check_type: 'metadata_integrity',
+        title: 'Aadhaar Masking Privacy Violation',
+        description: 'Document contains full 12-digit unmasked Aadhaar number without required regulatory masking.',
+        status: 'warning',
+        score: 45,
+        findings: {
+          masked_digits: 0,
+          unmasked_digits: 12,
+          regulation_status: 'Non-Compliant with Aadhaar Regulations',
+        },
+        suspicious_regions: [],
+        created_at: new Date().toISOString(),
+      },
+    ],
+  },
+  {
+    id: 'verif-tamp-1',
+    document_id: 'doc-pass-tamp-02',
+    user_id: 'officer-mha-1',
+    status: 'completed',
+    verdict: 'tampered',
+    confidence_score: 96.8,
+    tampering_risk_score: 93.5,
+    summary: 'Critical border interdiction alert: High probability of passport tampering detected. Biometric face mismatch indicates photo replacement; character baseline anomalies on date of birth and checksum failure on ICAO 9303 MRZ line 2.',
     metadata_analysis: {
       pdf_version: '1.7',
       producer: 'Adobe Photoshop 2025 / Spliced Layer',
       tamper_detected: true,
       exif_anomalies: 3,
       stream_hashes_match: false,
+    },
+    ocr_passport_data: {
+      document_number: 'Z5891402',
+      document_type_code: 'P',
+      issuing_country: 'IND',
+      full_name: 'SHARMA, RAJESH KUMAR',
+      surname: 'SHARMA',
+      given_names: 'RAJESH KUMAR',
+      nationality: 'INDIAN',
+      date_of_birth: '14/05/1996',
+      gender: 'M',
+      date_of_expiry: '11/03/2036',
+      place_of_issue: 'DELHI',
+      mrz_line1: 'P<INDSHARMA<<RAJESH<KUMAR<<<<<<<<<<<<<<<<<<<',
+      mrz_line2: 'Z5891402<4IND9605148M3603115<<<<<<<<<<<<<<06',
+      mrz_checksum_valid: false,
+      standards_compliance: 'Non-Compliant Format',
+    },
+    biometric_face_match: {
+      document_photo_url: '',
+      live_booth_photo_url: '',
+      similarity_score: 34.1,
+      match_status: 'photo_replaced',
+      liveness_verified: true,
+      confidence_level: 'high',
+      facial_landmarks_detected: 68,
+      tamper_flags: [
+        'Bounding cut-and-paste halo detected around photo perimeter',
+        'Facial embedding vector mismatch with live booth camera (Similarity 34.1%)',
+        'Quantization step discontinuity in portrait raster area',
+      ],
+    },
+    watchlist_query: {
+      interpol_sltd_status: 'FLAGGED',
+      interpol_sltd_hits: 1,
+      mha_loc_status: 'INTERDICTION_REQUIRED',
+      expiry_status: 'VALID',
+      days_to_expiry: 3650,
     },
     created_at: new Date(Date.now() - 3600 * 1000 * 2).toISOString(),
     completed_at: new Date(Date.now() - 3600 * 1000 * 1.9).toISOString(),
@@ -208,24 +542,25 @@ export const INITIAL_MOCK_VERIFICATIONS: VerificationRecord[] = [
       {
         id: 'chk-1',
         verification_id: 'verif-tamp-1',
-        check_type: 'font_consistency',
-        title: 'Font Kerning & Glyph Metrics',
-        description: 'Analyzes character spacing, typography weight, and anti-aliasing variations.',
+        check_type: 'digital_tampering',
+        title: 'Photo Replacement & Biometric Discontinuity',
+        description: 'Spectral ELA analysis and facial landmark boundary verification.',
         status: 'failed',
-        score: 32.5,
+        score: 24.0,
         findings: {
-          detected_fonts: ['Helvetica-Bold', 'Arial-Modified'],
-          baseline_shift_pt: 2.4,
-          kerning_anomaly_score: 92.1,
+          photo_spliced: true,
+          halo_border_detected: true,
+          biometric_similarity: '34.1%',
+          face_match_status: 'Mismatch - Impersonation Risk',
         },
         suspicious_regions: [
           {
             id: 'sr-1',
             page: 1,
-            coordinates: { x: 0.56, y: 0.58, width: 0.38, height: 0.05 },
+            coordinates: { x: 0.05, y: 0.16, width: 0.32, height: 0.28 },
             severity: 'critical',
-            label: 'Altered Invoice Total',
-            description: 'Glyph outline for "$142,500.00" shows mismatched kerning and duplicate anti-aliasing pixels.',
+            label: 'Spliced Photo Boundary',
+            description: 'Compression disparity and border halo indicate photo replacement over original passport substrate.',
           },
         ],
         created_at: new Date(Date.now() - 3600 * 1000 * 2).toISOString(),
@@ -233,23 +568,25 @@ export const INITIAL_MOCK_VERIFICATIONS: VerificationRecord[] = [
       {
         id: 'chk-2',
         verification_id: 'verif-tamp-1',
-        check_type: 'digital_tampering',
-        title: 'Error Level Analysis (ELA)',
-        description: 'Examines high-frequency compression gradient inconsistencies across the document canvas.',
+        check_type: 'layout_alignment',
+        title: 'ICAO Doc 9303 MRZ Checksum Integrity',
+        description: 'Validates 2-line machine readable zone check digits against parsed birth & expiry dates.',
         status: 'failed',
-        score: 28.0,
+        score: 18.0,
         findings: {
-          quantization_variance: '84.2%',
-          recompressed_regions: 2,
+          mrz_line2_valid: false,
+          computed_check_digit: '8',
+          encoded_check_digit: '4',
+          mismatch_reason: 'Tampered birth year 1996 fails composite modulus 7-3-1 weighting algorithm',
         },
         suspicious_regions: [
           {
             id: 'sr-2',
             page: 1,
-            coordinates: { x: 0.06, y: 0.66, width: 0.88, height: 0.11 },
-            severity: 'high',
-            label: 'Modified Wire Instructions',
-            description: 'Quantization table shows distinct secondary compression block boundary around bank routing coordinates.',
+            coordinates: { x: 0.05, y: 0.80, width: 0.90, height: 0.14 },
+            severity: 'critical',
+            label: 'Invalid MRZ Check-Digit',
+            description: 'Calculated check digit does not match composite hash of date of birth and expiry.',
           },
         ],
         created_at: new Date(Date.now() - 3600 * 1000 * 2).toISOString(),
@@ -257,59 +594,94 @@ export const INITIAL_MOCK_VERIFICATIONS: VerificationRecord[] = [
       {
         id: 'chk-3',
         verification_id: 'verif-tamp-1',
-        check_type: 'metadata_integrity',
-        title: 'Metadata & Stream Integrity',
-        description: 'Examines PDF trailer markers, object xref tables, and modification history.',
-        status: 'warning',
-        score: 65.0,
+        check_type: 'font_consistency',
+        title: 'Date of Birth & Expiry Kerning Drift',
+        description: 'Analyzes character spacing, typography weight, and anti-aliasing variations.',
+        status: 'failed',
+        score: 32.0,
         findings: {
-          creation_date: '2026-08-14T10:20:00Z',
-          modification_date: '2026-08-14T14:45:12Z',
-          discrepancy: 'Document modified with raster graphics editor after generation.',
-        },
-        suspicious_regions: [],
-        created_at: new Date(Date.now() - 3600 * 1000 * 2).toISOString(),
-      },
-      {
-        id: 'chk-4',
-        verification_id: 'verif-tamp-1',
-        check_type: 'signature_stamp',
-        title: 'Digital Signature & Stamp Verification',
-        description: 'Verifies visual pixel noise around authorized corporate stamps and handwritten signatures.',
-        status: 'warning',
-        score: 58.0,
-        findings: {
-          signature_cut_paste: true,
-          halo_effect_detected: true,
+          detected_fonts: ['OCR-B-Standard', 'Courier-Modified'],
+          baseline_shift_pt: 2.4,
+          kerning_anomaly_score: 91.2,
         },
         suspicious_regions: [
           {
             id: 'sr-3',
             page: 1,
-            coordinates: { x: 0.06, y: 0.84, width: 0.32, height: 0.06 },
-            severity: 'medium',
-            label: 'Copy-Paste Signature Halo',
-            description: 'Halo boundary pixel artifacts indicate signature was extracted and overlaid from another document.',
+            coordinates: { x: 0.38, y: 0.34, width: 0.25, height: 0.06 },
+            severity: 'high',
+            label: 'Altered Date of Birth',
+            description: 'Font kerning baseline shift of 2.4pt detected on birth year "1996".',
           },
         ],
+        created_at: new Date(Date.now() - 3600 * 1000 * 2).toISOString(),
+      },
+      {
+        id: 'chk-4',
+        verification_id: 'verif-tamp-1',
+        check_type: 'metadata_integrity',
+        title: 'Metadata & Software Producer Signatures',
+        description: 'Examines PDF trailer markers, object xref tables, and modification history.',
+        status: 'warning',
+        score: 58.0,
+        findings: {
+          creation_date: '2026-03-12T10:44:19Z',
+          modification_producer: 'Adobe Photoshop 24.0 (Windows)',
+          discrepancy: 'Document modified with raster graphics editor after government print spooling.',
+        },
+        suspicious_regions: [],
         created_at: new Date(Date.now() - 3600 * 1000 * 2).toISOString(),
       },
     ],
   },
   {
     id: 'verif-auth-2',
-    document_id: 'doc-orig-101',
-    user_id: 'user-demo-1',
+    document_id: 'doc-pass-auth-01',
+    user_id: 'officer-mha-1',
     status: 'completed',
     verdict: 'authentic',
-    confidence_score: 98.5,
-    tampering_risk_score: 2.1,
-    summary: 'Document exhibits high structural integrity, consistent font kerning, unbroken digital signatures, and genuine camera EXIF metadata without post-processing recompression artifacts.',
+    confidence_score: 98.8,
+    tampering_risk_score: 1.8,
+    summary: 'Document verified authentic for border clearance. ICAO Doc 9303 MRZ check digits verified, 97.8% biometric facial match with live passenger camera, uniform security microprinting, and zero Lookout Circular hits.',
     metadata_analysis: {
       pdf_version: '1.7',
-      creator: 'Adobe Acrobat Pro 2026',
+      creator: 'Government Security Press / SPMCIL Digital Spooler',
       compression: 'FlateDecode',
       signature_valid: true,
+    },
+    ocr_passport_data: {
+      document_number: 'A9842104',
+      document_type_code: 'P',
+      issuing_country: 'IND',
+      full_name: 'VERMA, PRIYA SUNIL',
+      surname: 'VERMA',
+      given_names: 'PRIYA SUNIL',
+      nationality: 'INDIAN',
+      date_of_birth: '22/09/1992',
+      gender: 'F',
+      date_of_expiry: '21/09/2032',
+      place_of_issue: 'MUMBAI',
+      mrz_line1: 'P<INDVERMA<<PRIYA<SUNIL<<<<<<<<<<<<<<<<<<<<<',
+      mrz_line2: 'A9842104<8IND9209224F3209218<<<<<<<<<<<<<<04',
+      mrz_checksum_valid: true,
+      standards_compliance: 'ICAO Doc 9303 Compliant',
+    },
+    biometric_face_match: {
+      document_photo_url: '',
+      live_booth_photo_url: '',
+      similarity_score: 97.8,
+      match_status: 'matched',
+      liveness_verified: true,
+      confidence_level: 'high',
+      facial_landmarks_detected: 68,
+      tamper_flags: [],
+    },
+    watchlist_query: {
+      interpol_sltd_status: 'CLEARED',
+      interpol_sltd_hits: 0,
+      mha_loc_status: 'NO_ADVERSE_RECORD',
+      expiry_status: 'VALID',
+      days_to_expiry: 2200,
     },
     created_at: new Date(Date.now() - 3600 * 1000 * 4).toISOString(),
     completed_at: new Date(Date.now() - 3600 * 1000 * 3.9).toISOString(),
@@ -318,23 +690,42 @@ export const INITIAL_MOCK_VERIFICATIONS: VerificationRecord[] = [
       {
         id: 'chk-auth-1',
         verification_id: 'verif-auth-2',
-        check_type: 'metadata_integrity',
-        title: 'Metadata & Stream Integrity',
-        description: 'Examines PDF trailer markers, object xref tables, and modification history.',
+        check_type: 'digital_tampering',
+        title: 'Biometric Face Match & Liveness',
+        description: 'Matches extracted photo against live booth camera capture with liveness verification.',
         status: 'passed',
-        score: 99.4,
-        findings: { linearized: true, xref_repaired: false },
+        score: 98.5,
+        findings: {
+          similarity_score: '97.8%',
+          facial_landmarks_matched: 68,
+          liveness_confirmed: true,
+        },
         suspicious_regions: [],
         created_at: new Date(Date.now() - 3600 * 1000 * 4).toISOString(),
       },
       {
         id: 'chk-auth-2',
         verification_id: 'verif-auth-2',
-        check_type: 'font_consistency',
-        title: 'Font Kerning & Typography',
-        description: 'Analyzes character spacing, typography weight, and anti-aliasing variations.',
+        check_type: 'layout_alignment',
+        title: 'ICAO Doc 9303 MRZ Validation',
+        description: 'Validates 2-line machine readable zone check digits against parsed birth & expiry dates.',
         status: 'passed',
-        score: 98.8,
+        score: 99.2,
+        findings: {
+          mrz_checksum_verified: true,
+          composite_check_digit: '04 (Valid)',
+        },
+        suspicious_regions: [],
+        created_at: new Date(Date.now() - 3600 * 1000 * 4).toISOString(),
+      },
+      {
+        id: 'chk-auth-3',
+        verification_id: 'verif-auth-2',
+        check_type: 'font_consistency',
+        title: 'Typography & Microprint Fidelity',
+        description: 'Verifies character metrics and microprint resolution against SPMCIL security plate.',
+        status: 'passed',
+        score: 99.0,
         findings: { embedded_fonts_valid: true, spacing_deviations: 0 },
         suspicious_regions: [],
         created_at: new Date(Date.now() - 3600 * 1000 * 4).toISOString(),
