@@ -12,8 +12,11 @@ if BASE_DIR not in sys.path:
 
 import json
 import base64
+import logging
 import cv2
 import numpy as np
+
+logger = logging.getLogger("docverify")
 from typing import Optional, List
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -173,11 +176,28 @@ def get_demo_samples():
     return {"samples": samples}
 
 
-def decode_image_bytes(data_bytes: bytes) -> Optional[np.ndarray]:
+def decode_image_bytes(data_bytes: bytes, filename: Optional[str] = None) -> Optional[np.ndarray]:
     if not data_bytes:
         return None
+    # If PDF document, rasterize the page using preprocessor
+    if (filename and filename.lower().endswith(".pdf")) or data_bytes.startswith(b"%PDF"):
+        try:
+            from pipeline.preprocessor import load_document_image
+            bgr, _, _ = load_document_image(data_bytes, filename or "document.pdf")
+            if bgr is not None and bgr.size > 0:
+                return bgr
+        except Exception as e:
+            logger.warning(f"PDF extraction in decode_image_bytes notice: {e}")
     nparr = np.frombuffer(data_bytes, np.uint8)
-    return cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+    img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+    if img is None and data_bytes.startswith(b"%PDF"):
+        try:
+            from pipeline.preprocessor import load_document_image
+            bgr, _, _ = load_document_image(data_bytes, "document.pdf")
+            return bgr
+        except Exception:
+            pass
+    return img
 
 
 async def decode_image_input(upload_file: Optional[UploadFile], base64_str: Optional[str]) -> Optional[np.ndarray]:
@@ -185,7 +205,9 @@ async def decode_image_input(upload_file: Optional[UploadFile], base64_str: Opti
         try:
             contents = await upload_file.read()
             if contents:
-                return decode_image_bytes(contents)
+                img = decode_image_bytes(contents, upload_file.filename)
+                if img is not None:
+                    return img
         except Exception:
             pass
     if base64_str:
@@ -292,7 +314,19 @@ async def verify_document_endpoint(
         # If live photo is presented, run 1:1 Two-Source Biometric Verification
         live_bgr = await decode_image_input(live_photo, live_photo_b64)
         if live_bgr is not None:
-            doc_bgr = decode_image_bytes(file_bytes)
+            doc_bgr = decode_image_bytes(file_bytes, safe_filename)
+            if doc_bgr is None:
+                for cand_key in [("face_detection", "cropDataUrl"), ("detection", "cropped_document"), ("detection", "original_document")]:
+                    cand_url = result.get(cand_key[0], {}).get(cand_key[1])
+                    if cand_url and isinstance(cand_url, str) and cand_url.startswith("data:image"):
+                        try:
+                            b = base64.b64decode(cand_url.split(",", 1)[1])
+                            doc_bgr = decode_image_bytes(b)
+                            if doc_bgr is not None:
+                                break
+                        except Exception:
+                            pass
+
             frames_bgr = []
             if live_frames:
                 try:
